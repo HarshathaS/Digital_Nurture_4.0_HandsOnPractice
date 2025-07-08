@@ -1,0 +1,169 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Text To Word</title></head><body><h1>Implementing Dependency Injection</h1>
+<h2>1. Update the XML Configuration</h2>
+<p class="ds-markdown-paragraph">We'll modify&nbsp;<code>applicationContext.xml</code>&nbsp;to explicitly wire the dependencies:</p>
+<div class="md-code-block md-code-block-dark">
+<div class="md-code-block-banner-wrap">
+<div class="md-code-block-banner md-code-block-banner-lite">
+<div class="_121d384">
+<div class="d2a24f03"><span class="d813de27">xml</span></div>
+<div class="d2a24f03">
+<div class="efa13877">
+<div class="ae809fef">&nbsp;</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<pre><span class="token prolog">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="token tag"><span class="token punctuation">&lt;</span>beans <span class="token attr-name">xmlns</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>http://www.springframework.org/schema/beans<span class="token punctuation">"</span></span>
+       <span class="token attr-name"><span class="token namespace">xmlns:</span>xsi</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>http://www.w3.org/2001/XMLSchema-instance<span class="token punctuation">"</span></span>
+       <span class="token attr-name"><span class="token namespace">xsi:</span>schemaLocation</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+
+    <span class="token comment">&lt;!-- BookRepository bean definition --&gt;</span>
+    <span class="token tag"><span class="token punctuation">&lt;</span>bean <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>bookRepository<span class="token punctuation">"</span></span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>com.library.repository.BookRepository<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+        <span class="token comment">&lt;!-- You could add property configurations here if needed --&gt;</span>
+    <span class="token tag"><span class="token punctuation">&lt;/</span>bean<span class="token punctuation">&gt;</span></span>
+    
+    <span class="token comment">&lt;!-- BookService bean with constructor injection --&gt;</span>
+    <span class="token tag"><span class="token punctuation">&lt;</span>bean <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>bookService<span class="token punctuation">"</span></span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>com.library.service.BookService<span class="token punctuation">"</span></span><span class="token punctuation">&gt;</span></span>
+        <span class="token tag"><span class="token punctuation">&lt;</span>constructor-arg <span class="token attr-name">ref</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>bookRepository<span class="token punctuation">"</span></span><span class="token punctuation">/&gt;</span></span>
+    <span class="token tag"><span class="token punctuation">&lt;/</span>bean<span class="token punctuation">&gt;</span></span>
+    
+    <span class="token comment">&lt;!-- Alternative configuration using setter injection --&gt;</span>
+    <span class="token comment">&lt;!--
+    &lt;bean id="bookService" class="com.library.service.BookService"&gt;
+        &lt;property name="bookRepository" ref="bookRepository"/&gt;
+    &lt;/bean&gt;
+    --&gt;</span>
+<span class="token tag"><span class="token punctuation">&lt;/</span>beans<span class="token punctuation">&gt;</span></span></pre>
+</div>
+<h2>2. Update the BookService Class</h2>
+<p class="ds-markdown-paragraph">Let's modify the&nbsp;<code>BookService</code>&nbsp;to support both constructor and setter injection:</p>
+<div class="md-code-block md-code-block-dark">
+<div class="md-code-block-banner-wrap">
+<div class="md-code-block-banner md-code-block-banner-lite">
+<div class="_121d384">
+<div class="d2a24f03"><span class="d813de27">java</span></div>
+<div class="d2a24f03">
+<div class="efa13877">&nbsp;</div>
+</div>
+</div>
+</div>
+</div>
+<pre><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>library<span class="token punctuation">.</span>service</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>library<span class="token punctuation">.</span>repository<span class="token punctuation">.</span></span><span class="token class-name">BookRepository</span></span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">BookService</span> <span class="token punctuation">{</span>
+    <span class="token keyword">private</span> <span class="token class-name">BookRepository</span> bookRepository<span class="token punctuation">;</span>
+
+    <span class="token comment">// Constructor for dependency injection</span>
+    <span class="token keyword">public</span> <span class="token class-name">BookService</span><span class="token punctuation">(</span><span class="token class-name">BookRepository</span> bookRepository<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>bookRepository <span class="token operator">=</span> bookRepository<span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"BookService created with constructor injection"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">// No-arg constructor (optional, needed if using setter injection)</span>
+    <span class="token keyword">public</span> <span class="token class-name">BookService</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"BookService created with no-arg constructor"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token comment">// Setter for dependency injection</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">setBookRepository</span><span class="token punctuation">(</span><span class="token class-name">BookRepository</span> bookRepository<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>bookRepository <span class="token operator">=</span> bookRepository<span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"BookRepository set via setter injection"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+
+    <span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">getBookDetails</span><span class="token punctuation">(</span><span class="token class-name">String</span> isbn<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>bookRepository <span class="token operator">==</span> <span class="token keyword">null</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">IllegalStateException</span><span class="token punctuation">(</span><span class="token string">"BookRepository dependency not injected!"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> bookRepository<span class="token punctuation">.</span><span class="token function">getBookInfo</span><span class="token punctuation">(</span>isbn<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></pre>
+</div>
+<h2>3. Update the BookRepository Class</h2>
+<p class="ds-markdown-paragraph">Let's enhance the repository with some basic functionality:</p>
+<div class="md-code-block md-code-block-dark">
+<div class="md-code-block-banner-wrap">
+<div class="md-code-block-banner md-code-block-banner-lite">
+<div class="_121d384">
+<div class="d2a24f03"><span class="d813de27">java</span></div>
+<div class="d2a24f03">
+<div class="efa13877">&nbsp;</div>
+</div>
+</div>
+</div>
+</div>
+<pre><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>library<span class="token punctuation">.</span>repository</span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">BookRepository</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token class-name">BookRepository</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"BookRepository initialized"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token keyword">public</span> <span class="token class-name">String</span> <span class="token function">getBookInfo</span><span class="token punctuation">(</span><span class="token class-name">String</span> isbn<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// In a real application, this would query a database</span>
+        <span class="token keyword">return</span> <span class="token string">"Book details for ISBN: "</span> <span class="token operator">+</span> isbn <span class="token operator">+</span> 
+               <span class="token string">"\nTitle: Spring in Action"</span> <span class="token operator">+</span>
+               <span class="token string">"\nAuthor: Craig Walls"</span> <span class="token operator">+</span>
+               <span class="token string">"\nPublisher: Manning Publications"</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></pre>
+</div>
+<h2>4. Test the Configuration</h2>
+<p class="ds-markdown-paragraph">Update the main application class to test both injection methods:</p>
+<div class="md-code-block md-code-block-dark">
+<div class="md-code-block-banner-wrap">
+<div class="md-code-block-banner md-code-block-banner-lite">
+<div class="_121d384">
+<div class="d2a24f03"><span class="d813de27">java</span></div>
+<div class="d2a24f03">
+<div class="efa13877">&nbsp;</div>
+</div>
+</div>
+</div>
+</div>
+<pre><span class="token keyword">package</span> <span class="token namespace">com<span class="token punctuation">.</span>library</span><span class="token punctuation">;</span>
+
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">com<span class="token punctuation">.</span>library<span class="token punctuation">.</span>service<span class="token punctuation">.</span></span><span class="token class-name">BookService</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>context<span class="token punctuation">.</span></span><span class="token class-name">ApplicationContext</span></span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token import"><span class="token namespace">org<span class="token punctuation">.</span>springframework<span class="token punctuation">.</span>context<span class="token punctuation">.</span>support<span class="token punctuation">.</span></span><span class="token class-name">ClassPathXmlApplicationContext</span></span><span class="token punctuation">;</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">LibraryManagementApplication</span> <span class="token punctuation">{</span>
+    <span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"Testing Constructor Injection:"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">testConstructorInjection</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span><span class="token string">"\nTesting Setter Injection:"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">testSetterInjection</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">testConstructorInjection</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// Load context with constructor injection configuration</span>
+        <span class="token class-name">ApplicationContext</span> context <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ClassPathXmlApplicationContext</span><span class="token punctuation">(</span>
+            <span class="token string">"classpath:applicationContext.xml"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        
+        <span class="token class-name">BookService</span> bookService <span class="token operator">=</span> context<span class="token punctuation">.</span><span class="token function">getBean</span><span class="token punctuation">(</span><span class="token string">"bookService"</span><span class="token punctuation">,</span> <span class="token class-name">BookService</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>bookService<span class="token punctuation">.</span><span class="token function">getBookDetails</span><span class="token punctuation">(</span><span class="token string">"978-1617294945"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        
+        <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">ClassPathXmlApplicationContext</span><span class="token punctuation">)</span> context<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">testSetterInjection</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// Temporarily modify the context to use setter injection</span>
+        <span class="token class-name">ApplicationContext</span> context <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ClassPathXmlApplicationContext</span><span class="token punctuation">(</span>
+            <span class="token keyword">new</span> <span class="token class-name">String</span><span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">{</span><span class="token string">"classpath:applicationContext.xml"</span><span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">ClassPathXmlApplicationContext</span><span class="token punctuation">)</span> context<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">setAllowBeanDefinitionOverriding</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">ClassPathXmlApplicationContext</span><span class="token punctuation">)</span> context<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">refresh</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        
+        <span class="token comment">// Get the service (will use setter injection if uncommented in XML)</span>
+        <span class="token class-name">BookService</span> bookService <span class="token operator">=</span> context<span class="token punctuation">.</span><span class="token function">getBean</span><span class="token punctuation">(</span><span class="token string">"bookService"</span><span class="token punctuation">,</span> <span class="token class-name">BookService</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">System</span><span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>bookService<span class="token punctuation">.</span><span class="token function">getBookDetails</span><span class="token punctuation">(</span><span class="token string">"978-1617291203"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        
+        <span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">ClassPathXmlApplicationContext</span><span class="token punctuation">)</span> context<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></pre>
+</div>
+<p class="ds-markdown-paragraph">&nbsp;</p></body></html>

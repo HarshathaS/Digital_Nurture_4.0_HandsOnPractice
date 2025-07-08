@@ -1,0 +1,127 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Text To Word</title></head><body><p class="MsoNormal"><span style="font-size: 20.0pt; line-height: 115%; font-family: 'Times New Roman',serif;">Configuring a Basic Spring Application</span></p>
+<p class="MsoNormal"><span style="font-size: 8.0pt; line-height: 115%; font-family: 'Times New Roman',serif;">&nbsp;</span></p>
+<p class="MsoNormal">1. Set Up a Spring Project</p>
+<p class="MsoNormal">First, let's create the Maven project and add dependencies.</p>
+<p class="MsoNormal">pom.xml</p>
+<p class="MsoNormal">xml</p>
+<p class="MsoNormal">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</p>
+<p class="MsoNormal">&lt;project xmlns="http://maven.apache.org/POM/4.0.0"</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>&lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;</p>
+<p class="MsoNormal">&nbsp;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>&lt;groupId&gt;com.library&lt;/groupId&gt;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>&lt;artifactId&gt;LibraryManagement&lt;/artifactId&gt;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>&lt;version&gt;1.0-SNAPSHOT&lt;/version&gt;</p>
+<p class="MsoNormal">&nbsp;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>&lt;properties&gt;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>&lt;maven.compiler.source&gt;11&lt;/maven.compiler.source&gt;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>&lt;maven.compiler.target&gt;11&lt;/maven.compiler.target&gt;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>&lt;spring.version&gt;5.3.20&lt;/spring.version&gt;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>&lt;/properties&gt;</p>
+<p class="MsoNormal">&nbsp;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>&lt;dependencies&gt;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>&lt;!-- Spring Core --&gt;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>&lt;dependency&gt;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>&lt;groupId&gt;org.springframework&lt;/groupId&gt;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>&lt;artifactId&gt;spring-context&lt;/artifactId&gt;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>&lt;version&gt;${spring.version}&lt;/version&gt;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>&lt;/dependency&gt;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>&lt;/dependencies&gt;</p>
+<p class="MsoNormal">&lt;/project&gt;</p>
+<p class="MsoNormal">&nbsp;</p>
+<p class="MsoNormal">2. Configure the Application Context</p>
+<p class="MsoNormal">Create&nbsp;src/main/resources/applicationContext.xml:</p>
+<p class="MsoNormal">xml</p>
+<p class="MsoNormal">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</p>
+<p class="MsoNormal">&lt;beans xmlns="http://www.springframework.org/schema/beans"</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>xsi:schemaLocation="http://www.springframework.org/schema/beans</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>http://www.springframework.org/schema/beans/spring-beans.xsd"&gt;</p>
+<p class="MsoNormal">&nbsp;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>&lt;!-- BookRepository bean --&gt;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>&lt;bean id="bookRepository" class="com.library.repository.BookRepository"/&gt;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span></p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>&lt;!-- BookService bean with dependency injection --&gt;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>&lt;bean id="bookService" class="com.library.service.BookService"&gt;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>&lt;property name="bookRepository" ref="bookRepository"/&gt;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>&lt;/bean&gt;</p>
+<p class="MsoNormal">&lt;/beans&gt;</p>
+<p class="MsoNormal">&nbsp;</p>
+<p class="MsoNormal">3. Define Service and Repository Classes</p>
+<p class="MsoNormal">BookRepository (src/main/java/com/library/repository/BookRepository.java)</p>
+<p class="MsoNormal">java</p>
+<p class="MsoNormal">package com.library.repository;</p>
+<p class="MsoNormal">&nbsp;</p>
+<p class="MsoNormal">public class BookRepository {</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>// This would typically include database operations</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>// For now, we'll just add a simple method for demonstration</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>public String getBookInfo(String isbn) {</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>return "Book details for ISBN: " + isbn;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>}</p>
+<p class="MsoNormal">}</p>
+<p class="MsoNormal">&nbsp;</p>
+<p class="MsoNormal">BookService (src/main/java/com/library/service/BookService.java)</p>
+<p class="MsoNormal">package com.library.service;</p>
+<p class="MsoNormal">&nbsp;</p>
+<p class="MsoNormal">import com.library.repository.BookRepository;</p>
+<p class="MsoNormal">&nbsp;</p>
+<p class="MsoNormal">public class BookService {</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>private BookRepository bookRepository;</p>
+<p class="MsoNormal">&nbsp;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>// Setter for dependency injection</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>public void setBookRepository(BookRepository bookRepository) {</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>this.bookRepository = bookRepository;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>}</p>
+<p class="MsoNormal">&nbsp;</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>public String getBookDetails(String isbn) {</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>return bookRepository.getBookInfo(isbn);</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>}</p>
+<p class="MsoNormal">}</p>
+<p class="MsoNormal">&nbsp;</p>
+<p class="MsoNormal">4. Run the Application</p>
+<p class="MsoNormal">Create a main class to test the configuration:</p>
+<p class="MsoNormal">LibraryApp (src/main/java/com/library/LibraryApp.java)</p>
+<p class="MsoNormal">&nbsp;</p>
+<p class="MsoNormal">package com.library;</p>
+<p class="MsoNormal">&nbsp;</p>
+<p class="MsoNormal">import com.library.service.BookService;</p>
+<p class="MsoNormal">import org.springframework.context.ApplicationContext;</p>
+<p class="MsoNormal">import org.springframework.context.support.ClassPathXmlApplicationContext;</p>
+<p class="MsoNormal">&nbsp;</p>
+<p class="MsoNormal">public class LibraryApp {</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>public static void main(String[] args) {</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>// Load the Spring application context</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>ApplicationContext context = new ClassPathXmlApplicationContext("applicationContext.xml");</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>// Get the BookService bean</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>BookService bookService = context.getBean("bookService", BookService.class);</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>// Test the service</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>String bookInfo = bookService.getBookDetails("123-456-789");</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>System.out.println(bookInfo);</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>// Close the context</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>((ClassPathXmlApplicationContext) context).close();</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>}</p>
+<p class="MsoNormal">}</p>
+<p class="MsoNormal">&nbsp;</p>
+<p class="MsoNormal">Project Structure:</p>
+<p class="MsoNormal">&nbsp;</p>
+<p class="MsoNormal">LibraryManagement/</p>
+<p class="MsoNormal"><span lang="EN-US" style="font-family: 'MS Gothic'; mso-bidi-font-family: 'MS Gothic';">├</span><span style="mso-ascii-font-family: Aptos; mso-hansi-font-family: Aptos; mso-bidi-font-family: Aptos;">──</span> pom.xml</p>
+<p class="MsoNormal">└── src/</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span><span lang="EN-US" style="font-family: 'MS Gothic'; mso-bidi-font-family: 'MS Gothic';">├</span><span style="mso-ascii-font-family: Aptos; mso-hansi-font-family: Aptos; mso-bidi-font-family: Aptos;">──</span> main/</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>│<span style="mso-spacerun: yes;">&nbsp;&nbsp; </span><span lang="EN-US" style="font-family: 'MS Gothic'; mso-bidi-font-family: 'MS Gothic';">├</span><span style="mso-ascii-font-family: Aptos; mso-hansi-font-family: Aptos; mso-bidi-font-family: Aptos;">──</span> java/</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>│<span style="mso-spacerun: yes;">&nbsp;&nbsp; </span>│<span style="mso-spacerun: yes;">&nbsp;&nbsp; </span>└── com/</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>│<span style="mso-spacerun: yes;">&nbsp;&nbsp; </span>│<span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>└── library/</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>│<span style="mso-spacerun: yes;">&nbsp;&nbsp; </span>│<span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span lang="EN-US" style="font-family: 'MS Gothic'; mso-bidi-font-family: 'MS Gothic';">├</span><span style="mso-ascii-font-family: Aptos; mso-hansi-font-family: Aptos; mso-bidi-font-family: Aptos;">──</span> LibraryApp.java</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>│<span style="mso-spacerun: yes;">&nbsp;&nbsp; </span>│<span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span><span lang="EN-US" style="font-family: 'MS Gothic'; mso-bidi-font-family: 'MS Gothic';">├</span><span style="mso-ascii-font-family: Aptos; mso-hansi-font-family: Aptos; mso-bidi-font-family: Aptos;">──</span> repository/</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>│<span style="mso-spacerun: yes;">&nbsp;&nbsp; </span>│<span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>│<span style="mso-spacerun: yes;">&nbsp;&nbsp; </span>└── BookRepository.java</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>│<span style="mso-spacerun: yes;">&nbsp;&nbsp; </span>│<span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>└── service/</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>│<span style="mso-spacerun: yes;">&nbsp;&nbsp; </span>│<span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>└── BookService.java</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>│<span style="mso-spacerun: yes;">&nbsp;&nbsp; </span>└── resources/</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>│<span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>└── applicationContext.xml</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp; </span>└── test/</p>
+<p class="MsoNormal"><span style="mso-spacerun: yes;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>└── java/</p>
+<p class="MsoNormal">&nbsp;</p></body></html>
