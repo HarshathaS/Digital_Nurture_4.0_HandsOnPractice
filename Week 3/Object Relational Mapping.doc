@@ -1,0 +1,293 @@
+<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Text To Word</title></head><body><h1>Implementation of Object-Relational Mapping (O/R Mapping) with Spring Data JPA</h1>
+<h2>1. Entity Class Definition</h2>
+<div class="md-code-block md-code-block-dark">
+<pre><span class="token annotation punctuation">@Entity</span>
+<span class="token annotation punctuation">@Table</span><span class="token punctuation">(</span>name <span class="token operator">=</span> <span class="token string">"students"</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Student</span> <span class="token punctuation">{</span>
+    
+    <span class="token annotation punctuation">@Id</span>
+    <span class="token annotation punctuation">@GeneratedValue</span><span class="token punctuation">(</span>strategy <span class="token operator">=</span> <span class="token class-name">GenerationType</span><span class="token punctuation">.</span><span class="token constant">IDENTITY</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> <span class="token class-name">Long</span> id<span class="token punctuation">;</span>
+    
+    <span class="token annotation punctuation">@Column</span><span class="token punctuation">(</span>name <span class="token operator">=</span> <span class="token string">"student_name"</span><span class="token punctuation">,</span> nullable <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">,</span> length <span class="token operator">=</span> <span class="token number">100</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> <span class="token class-name">String</span> name<span class="token punctuation">;</span>
+    
+    <span class="token annotation punctuation">@Column</span><span class="token punctuation">(</span>unique <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> <span class="token class-name">String</span> email<span class="token punctuation">;</span>
+    
+    <span class="token annotation punctuation">@Enumerated</span><span class="token punctuation">(</span><span class="token class-name">EnumType</span><span class="token punctuation">.</span><span class="token constant">STRING</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> <span class="token class-name">Gender</span> gender<span class="token punctuation">;</span>
+    
+    <span class="token annotation punctuation">@Temporal</span><span class="token punctuation">(</span><span class="token class-name">TemporalType</span><span class="token punctuation">.</span><span class="token constant">DATE</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> <span class="token class-name">Date</span> birthDate<span class="token punctuation">;</span>
+    
+    <span class="token annotation punctuation">@Embedded</span>
+    <span class="token keyword">private</span> <span class="token class-name">Address</span> address<span class="token punctuation">;</span>
+    
+    <span class="token annotation punctuation">@OneToMany</span><span class="token punctuation">(</span>mappedBy <span class="token operator">=</span> <span class="token string">"student"</span><span class="token punctuation">,</span> cascade <span class="token operator">=</span> <span class="token class-name">CascadeType</span><span class="token punctuation">.</span><span class="token constant">ALL</span><span class="token punctuation">,</span> orphanRemoval <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">CourseRegistration</span><span class="token punctuation">&gt;</span></span> registrations <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    
+    <span class="token annotation punctuation">@CreationTimestamp</span>
+    <span class="token keyword">private</span> <span class="token class-name">LocalDateTime</span> createdAt<span class="token punctuation">;</span>
+    
+    <span class="token annotation punctuation">@UpdateTimestamp</span>
+    <span class="token keyword">private</span> <span class="token class-name">LocalDateTime</span> updatedAt<span class="token punctuation">;</span>
+    
+    <span class="token comment">// Constructors, getters, setters</span>
+    <span class="token keyword">public</span> <span class="token class-name">Student</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span><span class="token punctuation">}</span>
+    
+    <span class="token keyword">public</span> <span class="token class-name">Student</span><span class="token punctuation">(</span><span class="token class-name">String</span> name<span class="token punctuation">,</span> <span class="token class-name">String</span> email<span class="token punctuation">,</span> <span class="token class-name">Gender</span> gender<span class="token punctuation">,</span> <span class="token class-name">Date</span> birthDate<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>name <span class="token operator">=</span> name<span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>email <span class="token operator">=</span> email<span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>gender <span class="token operator">=</span> gender<span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>birthDate <span class="token operator">=</span> birthDate<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token comment">// Helper method for bidirectional relationship</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">addRegistration</span><span class="token punctuation">(</span><span class="token class-name">CourseRegistration</span> registration<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        registrations<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>registration<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        registration<span class="token punctuation">.</span><span class="token function">setStudent</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token comment">// Getters and setters...</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">public</span> <span class="token keyword">enum</span> <span class="token class-name">Gender</span> <span class="token punctuation">{</span>
+    <span class="token constant">MALE</span><span class="token punctuation">,</span> <span class="token constant">FEMALE</span><span class="token punctuation">,</span> <span class="token constant">OTHER</span>
+<span class="token punctuation">}</span>
+
+<span class="token annotation punctuation">@Embeddable</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Address</span> <span class="token punctuation">{</span>
+    <span class="token keyword">private</span> <span class="token class-name">String</span> street<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token class-name">String</span> city<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token class-name">String</span> state<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token class-name">String</span> zipCode<span class="token punctuation">;</span>
+    
+    <span class="token comment">// Getters and setters...</span>
+<span class="token punctuation">}</span></pre>
+</div>
+<h2>2. Related Entities</h2>
+<div class="md-code-block md-code-block-dark">
+<pre><span class="token annotation punctuation">@Entity</span>
+<span class="token annotation punctuation">@Table</span><span class="token punctuation">(</span>name <span class="token operator">=</span> <span class="token string">"courses"</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">Course</span> <span class="token punctuation">{</span>
+    <span class="token annotation punctuation">@Id</span>
+    <span class="token annotation punctuation">@GeneratedValue</span><span class="token punctuation">(</span>strategy <span class="token operator">=</span> <span class="token class-name">GenerationType</span><span class="token punctuation">.</span><span class="token constant">IDENTITY</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> <span class="token class-name">Long</span> id<span class="token punctuation">;</span>
+    
+    <span class="token keyword">private</span> <span class="token class-name">String</span> code<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token class-name">String</span> title<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token class-name">Integer</span> credits<span class="token punctuation">;</span>
+    
+    <span class="token annotation punctuation">@OneToMany</span><span class="token punctuation">(</span>mappedBy <span class="token operator">=</span> <span class="token string">"course"</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">CourseRegistration</span><span class="token punctuation">&gt;</span></span> registrations <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">ArrayList</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">&gt;</span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    
+    <span class="token comment">// Constructors, getters, setters...</span>
+<span class="token punctuation">}</span>
+
+<span class="token annotation punctuation">@Entity</span>
+<span class="token annotation punctuation">@Table</span><span class="token punctuation">(</span>name <span class="token operator">=</span> <span class="token string">"course_registrations"</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">CourseRegistration</span> <span class="token punctuation">{</span>
+    <span class="token annotation punctuation">@Id</span>
+    <span class="token annotation punctuation">@GeneratedValue</span><span class="token punctuation">(</span>strategy <span class="token operator">=</span> <span class="token class-name">GenerationType</span><span class="token punctuation">.</span><span class="token constant">IDENTITY</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> <span class="token class-name">Long</span> id<span class="token punctuation">;</span>
+    
+    <span class="token annotation punctuation">@ManyToOne</span><span class="token punctuation">(</span>fetch <span class="token operator">=</span> <span class="token class-name">FetchType</span><span class="token punctuation">.</span><span class="token constant">LAZY</span><span class="token punctuation">)</span>
+    <span class="token annotation punctuation">@JoinColumn</span><span class="token punctuation">(</span>name <span class="token operator">=</span> <span class="token string">"student_id"</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> <span class="token class-name">Student</span> student<span class="token punctuation">;</span>
+    
+    <span class="token annotation punctuation">@ManyToOne</span><span class="token punctuation">(</span>fetch <span class="token operator">=</span> <span class="token class-name">FetchType</span><span class="token punctuation">.</span><span class="token constant">LAZY</span><span class="token punctuation">)</span>
+    <span class="token annotation punctuation">@JoinColumn</span><span class="token punctuation">(</span>name <span class="token operator">=</span> <span class="token string">"course_id"</span><span class="token punctuation">)</span>
+    <span class="token keyword">private</span> <span class="token class-name">Course</span> course<span class="token punctuation">;</span>
+    
+    <span class="token keyword">private</span> <span class="token class-name">Date</span> registrationDate<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token class-name">String</span> semester<span class="token punctuation">;</span>
+    
+    <span class="token comment">// Constructors, getters, setters...</span>
+<span class="token punctuation">}</span></pre>
+</div>
+<h2>3. Repository Interfaces</h2>
+<div class="md-code-block md-code-block-dark">
+<pre><span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">StudentRepository</span> <span class="token keyword">extends</span> <span class="token class-name">JpaRepository</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Student</span><span class="token punctuation">,</span> <span class="token class-name">Long</span><span class="token punctuation">&gt;</span></span> <span class="token punctuation">{</span>
+    <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Student</span><span class="token punctuation">&gt;</span></span> <span class="token function">findByNameContainingIgnoreCase</span><span class="token punctuation">(</span><span class="token class-name">String</span> name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Student</span><span class="token punctuation">&gt;</span></span> <span class="token function">findByGender</span><span class="token punctuation">(</span><span class="token class-name">Gender</span> gender<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Student</span><span class="token punctuation">&gt;</span></span> <span class="token function">findByBirthDateBetween</span><span class="token punctuation">(</span><span class="token class-name">Date</span> start<span class="token punctuation">,</span> <span class="token class-name">Date</span> end<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name">Optional</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Student</span><span class="token punctuation">&gt;</span></span> <span class="token function">findByEmail</span><span class="token punctuation">(</span><span class="token class-name">String</span> email<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">CourseRepository</span> <span class="token keyword">extends</span> <span class="token class-name">JpaRepository</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Course</span><span class="token punctuation">,</span> <span class="token class-name">Long</span><span class="token punctuation">&gt;</span></span> <span class="token punctuation">{</span>
+    <span class="token class-name">Optional</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Course</span><span class="token punctuation">&gt;</span></span> <span class="token function">findByCode</span><span class="token punctuation">(</span><span class="token class-name">String</span> code<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">public</span> <span class="token keyword">interface</span> <span class="token class-name">RegistrationRepository</span> <span class="token keyword">extends</span> <span class="token class-name">JpaRepository</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">CourseRegistration</span><span class="token punctuation">,</span> <span class="token class-name">Long</span><span class="token punctuation">&gt;</span></span> <span class="token punctuation">{</span>
+    <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">CourseRegistration</span><span class="token punctuation">&gt;</span></span> <span class="token function">findByStudentAndSemester</span><span class="token punctuation">(</span><span class="token class-name">Student</span> student<span class="token punctuation">,</span> <span class="token class-name">String</span> semester<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></pre>
+</div>
+<h2>4. Service Layer Implementation</h2>
+<div class="md-code-block md-code-block-dark">
+<pre><span class="token annotation punctuation">@Service</span>
+<span class="token annotation punctuation">@Transactional</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">StudentService</span> <span class="token punctuation">{</span>
+    
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">StudentRepository</span> studentRepository<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">CourseRepository</span> courseRepository<span class="token punctuation">;</span>
+    
+    <span class="token keyword">public</span> <span class="token class-name">StudentService</span><span class="token punctuation">(</span><span class="token class-name">StudentRepository</span> studentRepository<span class="token punctuation">,</span> 
+                        <span class="token class-name">CourseRepository</span> courseRepository<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>studentRepository <span class="token operator">=</span> studentRepository<span class="token punctuation">;</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>courseRepository <span class="token operator">=</span> courseRepository<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token keyword">public</span> <span class="token class-name">Student</span> <span class="token function">createStudent</span><span class="token punctuation">(</span><span class="token class-name">Student</span> student<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>studentRepository<span class="token punctuation">.</span><span class="token function">existsByEmail</span><span class="token punctuation">(</span>student<span class="token punctuation">.</span><span class="token function">getEmail</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">IllegalArgumentException</span><span class="token punctuation">(</span><span class="token string">"Email already exists"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">return</span> studentRepository<span class="token punctuation">.</span><span class="token function">save</span><span class="token punctuation">(</span>student<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token keyword">public</span> <span class="token class-name">Student</span> <span class="token function">registerForCourse</span><span class="token punctuation">(</span><span class="token class-name">Long</span> studentId<span class="token punctuation">,</span> <span class="token class-name">String</span> courseCode<span class="token punctuation">,</span> <span class="token class-name">String</span> semester<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">Student</span> student <span class="token operator">=</span> studentRepository<span class="token punctuation">.</span><span class="token function">findById</span><span class="token punctuation">(</span>studentId<span class="token punctuation">)</span>
+            <span class="token punctuation">.</span><span class="token function">orElseThrow</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-&gt;</span> <span class="token keyword">new</span> <span class="token class-name">EntityNotFoundException</span><span class="token punctuation">(</span><span class="token string">"Student not found"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        
+        <span class="token class-name">Course</span> course <span class="token operator">=</span> courseRepository<span class="token punctuation">.</span><span class="token function">findByCode</span><span class="token punctuation">(</span>courseCode<span class="token punctuation">)</span>
+            <span class="token punctuation">.</span><span class="token function">orElseThrow</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">-&gt;</span> <span class="token keyword">new</span> <span class="token class-name">EntityNotFoundException</span><span class="token punctuation">(</span><span class="token string">"Course not found"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        
+        <span class="token class-name">CourseRegistration</span> registration <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">CourseRegistration</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        registration<span class="token punctuation">.</span><span class="token function">setStudent</span><span class="token punctuation">(</span>student<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        registration<span class="token punctuation">.</span><span class="token function">setCourse</span><span class="token punctuation">(</span>course<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        registration<span class="token punctuation">.</span><span class="token function">setSemester</span><span class="token punctuation">(</span>semester<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        registration<span class="token punctuation">.</span><span class="token function">setRegistrationDate</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Date</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        
+        student<span class="token punctuation">.</span><span class="token function">addRegistration</span><span class="token punctuation">(</span>registration<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> studentRepository<span class="token punctuation">.</span><span class="token function">save</span><span class="token punctuation">(</span>student<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token annotation punctuation">@Transactional</span><span class="token punctuation">(</span>readOnly <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Student</span><span class="token punctuation">&gt;</span></span> <span class="token function">findStudentsByCourse</span><span class="token punctuation">(</span><span class="token class-name">String</span> courseCode<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> studentRepository<span class="token punctuation">.</span><span class="token function">findByRegistrationsCourseCode</span><span class="token punctuation">(</span>courseCode<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token comment">// Other service methods...</span>
+<span class="token punctuation">}</span></pre>
+</div>
+<h2>5. Controller Layer</h2>
+<div class="md-code-block md-code-block-dark">
+<pre><span class="token annotation punctuation">@RestController</span>
+<span class="token annotation punctuation">@RequestMapping</span><span class="token punctuation">(</span><span class="token string">"/api/students"</span><span class="token punctuation">)</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">StudentController</span> <span class="token punctuation">{</span>
+    
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">StudentService</span> studentService<span class="token punctuation">;</span>
+    
+    <span class="token keyword">public</span> <span class="token class-name">StudentController</span><span class="token punctuation">(</span><span class="token class-name">StudentService</span> studentService<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">this</span><span class="token punctuation">.</span>studentService <span class="token operator">=</span> studentService<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token annotation punctuation">@PostMapping</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Student</span><span class="token punctuation">&gt;</span></span> <span class="token function">createStudent</span><span class="token punctuation">(</span><span class="token annotation punctuation">@RequestBody</span> <span class="token class-name">Student</span> student<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">Student</span> created <span class="token operator">=</span> studentService<span class="token punctuation">.</span><span class="token function">createStudent</span><span class="token punctuation">(</span>student<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token class-name">URI</span> location <span class="token operator">=</span> <span class="token class-name">ServletUriComponentsBuilder</span><span class="token punctuation">.</span><span class="token function">fromCurrentRequest</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token punctuation">.</span><span class="token function">path</span><span class="token punctuation">(</span><span class="token string">"/{id}"</span><span class="token punctuation">)</span>
+            <span class="token punctuation">.</span><span class="token function">buildAndExpand</span><span class="token punctuation">(</span>created<span class="token punctuation">.</span><span class="token function">getId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+            <span class="token punctuation">.</span><span class="token function">toUri</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token class-name">ResponseEntity</span><span class="token punctuation">.</span><span class="token function">created</span><span class="token punctuation">(</span>location<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">body</span><span class="token punctuation">(</span>created<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token annotation punctuation">@PostMapping</span><span class="token punctuation">(</span><span class="token string">"/{studentId}/registrations"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Student</span><span class="token punctuation">&gt;</span></span> <span class="token function">registerCourse</span><span class="token punctuation">(</span>
+            <span class="token annotation punctuation">@PathVariable</span> <span class="token class-name">Long</span> studentId<span class="token punctuation">,</span>
+            <span class="token annotation punctuation">@RequestBody</span> <span class="token class-name">RegistrationRequest</span> request<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">Student</span> student <span class="token operator">=</span> studentService<span class="token punctuation">.</span><span class="token function">registerForCourse</span><span class="token punctuation">(</span>
+            studentId<span class="token punctuation">,</span> request<span class="token punctuation">.</span><span class="token function">getCourseCode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> request<span class="token punctuation">.</span><span class="token function">getSemester</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token class-name">ResponseEntity</span><span class="token punctuation">.</span><span class="token function">ok</span><span class="token punctuation">(</span>student<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token annotation punctuation">@GetMapping</span><span class="token punctuation">(</span><span class="token string">"/by-course/{courseCode}"</span><span class="token punctuation">)</span>
+    <span class="token keyword">public</span> <span class="token class-name">ResponseEntity</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">List</span><span class="token punctuation">&lt;</span><span class="token class-name">Student</span><span class="token punctuation">&gt;</span><span class="token punctuation">&gt;</span></span> <span class="token function">getStudentsByCourse</span><span class="token punctuation">(</span>
+            <span class="token annotation punctuation">@PathVariable</span> <span class="token class-name">String</span> courseCode<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token class-name">ResponseEntity</span><span class="token punctuation">.</span><span class="token function">ok</span><span class="token punctuation">(</span>studentService<span class="token punctuation">.</span><span class="token function">findStudentsByCourse</span><span class="token punctuation">(</span>courseCode<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token comment">// Other endpoints...</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">RegistrationRequest</span> <span class="token punctuation">{</span>
+    <span class="token keyword">private</span> <span class="token class-name">String</span> courseCode<span class="token punctuation">;</span>
+    <span class="token keyword">private</span> <span class="token class-name">String</span> semester<span class="token punctuation">;</span>
+    
+    <span class="token comment">// Getters and setters...</span>
+<span class="token punctuation">}</span></pre>
+</div>
+<h2>6. Configuration</h2>
+<div class="md-code-block md-code-block-dark">
+<pre><span class="token annotation punctuation">@Configuration</span>
+<span class="token annotation punctuation">@EnableJpaRepositories</span><span class="token punctuation">(</span>basePackages <span class="token operator">=</span> <span class="token string">"com.example.repository"</span><span class="token punctuation">)</span>
+<span class="token annotation punctuation">@EnableTransactionManagement</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">JpaConfig</span> <span class="token punctuation">{</span>
+    
+    <span class="token annotation punctuation">@Bean</span>
+    <span class="token keyword">public</span> <span class="token class-name">LocalContainerEntityManagerFactoryBean</span> <span class="token function">entityManagerFactory</span><span class="token punctuation">(</span>
+            <span class="token class-name">DataSource</span> dataSource<span class="token punctuation">,</span> <span class="token class-name">JpaVendorAdapter</span> jpaVendorAdapter<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">LocalContainerEntityManagerFactoryBean</span> em <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">LocalContainerEntityManagerFactoryBean</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        em<span class="token punctuation">.</span><span class="token function">setDataSource</span><span class="token punctuation">(</span>dataSource<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        em<span class="token punctuation">.</span><span class="token function">setPackagesToScan</span><span class="token punctuation">(</span><span class="token string">"com.example.model"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        em<span class="token punctuation">.</span><span class="token function">setJpaVendorAdapter</span><span class="token punctuation">(</span>jpaVendorAdapter<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> em<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token annotation punctuation">@Bean</span>
+    <span class="token keyword">public</span> <span class="token class-name">JpaVendorAdapter</span> <span class="token function">jpaVendorAdapter</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token class-name">HibernateJpaVendorAdapter</span> adapter <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HibernateJpaVendorAdapter</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        adapter<span class="token punctuation">.</span><span class="token function">setShowSql</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        adapter<span class="token punctuation">.</span><span class="token function">setGenerateDdl</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        adapter<span class="token punctuation">.</span><span class="token function">setDatabasePlatform</span><span class="token punctuation">(</span><span class="token string">"org.hibernate.dialect.MySQL8Dialect"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> adapter<span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    
+    <span class="token annotation punctuation">@Bean</span>
+    <span class="token keyword">public</span> <span class="token class-name">PlatformTransactionManager</span> <span class="token function">transactionManager</span><span class="token punctuation">(</span><span class="token class-name">EntityManagerFactory</span> emf<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">JpaTransactionManager</span><span class="token punctuation">(</span>emf<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></pre>
+</div>
+<h2>7. Testing the O/R Mapping</h2>
+<div class="md-code-block md-code-block-dark">
+<pre><span class="token annotation punctuation">@SpringBootTest</span>
+<span class="token annotation punctuation">@Transactional</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">StudentServiceIntegrationTest</span> <span class="token punctuation">{</span>
+    
+    <span class="token annotation punctuation">@Autowired</span>
+    <span class="token keyword">private</span> <span class="token class-name">StudentService</span> studentService<span class="token punctuation">;</span>
+    
+    <span class="token annotation punctuation">@Autowired</span>
+    <span class="token keyword">private</span> <span class="token class-name">StudentRepository</span> studentRepository<span class="token punctuation">;</span>
+    
+    <span class="token annotation punctuation">@Autowired</span>
+    <span class="token keyword">private</span> <span class="token class-name">CourseRepository</span> courseRepository<span class="token punctuation">;</span>
+    
+    <span class="token annotation punctuation">@Test</span>
+    <span class="token keyword">public</span> <span class="token keyword">void</span> <span class="token function">testStudentCourseRegistration</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        <span class="token comment">// Create test data</span>
+        <span class="token class-name">Student</span> student <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Student</span><span class="token punctuation">(</span><span class="token string">"John Doe"</span><span class="token punctuation">,</span> <span class="token string">"john@example.com"</span><span class="token punctuation">,</span> <span class="token class-name">Gender</span><span class="token punctuation">.</span><span class="token constant">MALE</span><span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Date</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        student<span class="token punctuation">.</span><span class="token function">setAddress</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">Address</span><span class="token punctuation">(</span><span class="token string">"123 Main St"</span><span class="token punctuation">,</span> <span class="token string">"Anytown"</span><span class="token punctuation">,</span> <span class="token string">"CA"</span><span class="token punctuation">,</span> <span class="token string">"12345"</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        student <span class="token operator">=</span> studentRepository<span class="token punctuation">.</span><span class="token function">save</span><span class="token punctuation">(</span>student<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        
+        <span class="token class-name">Course</span> course <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Course</span><span class="token punctuation">(</span><span class="token string">"CS101"</span><span class="token punctuation">,</span> <span class="token string">"Introduction to Programming"</span><span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        course <span class="token operator">=</span> courseRepository<span class="token punctuation">.</span><span class="token function">save</span><span class="token punctuation">(</span>course<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        
+        <span class="token comment">// Test registration</span>
+        <span class="token class-name">Student</span> updatedStudent <span class="token operator">=</span> studentService<span class="token punctuation">.</span><span class="token function">registerForCourse</span><span class="token punctuation">(</span>
+            student<span class="token punctuation">.</span><span class="token function">getId</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> course<span class="token punctuation">.</span><span class="token function">getCode</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">"Fall 2023"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        
+        <span class="token comment">// Verify results</span>
+        <span class="token function">assertNotNull</span><span class="token punctuation">(</span>updatedStudent<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">assertEquals</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> updatedStudent<span class="token punctuation">.</span><span class="token function">getRegistrations</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">assertEquals</span><span class="token punctuation">(</span><span class="token string">"Fall 2023"</span><span class="token punctuation">,</span> 
+            updatedStudent<span class="token punctuation">.</span><span class="token function">getRegistrations</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getSemester</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        
+        <span class="token comment">// Test query</span>
+        <span class="token class-name">List</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">Student</span><span class="token punctuation">&gt;</span></span> studentsInCourse <span class="token operator">=</span> studentService<span class="token punctuation">.</span><span class="token function">findStudentsByCourse</span><span class="token punctuation">(</span><span class="token string">"CS101"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">assertEquals</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span> studentsInCourse<span class="token punctuation">.</span><span class="token function">size</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token function">assertEquals</span><span class="token punctuation">(</span><span class="token string">"John Doe"</span><span class="token punctuation">,</span> studentsInCourse<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></pre>
+</div></body></html>
